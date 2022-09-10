@@ -79,7 +79,7 @@ class P100Plug(SwitchEntity):
             try:
                 func(self, *args, **kwargs)
             except:
-                _LOGGER.error("Could not connect to plug. Trying to relogin")
+                _LOGGER.warn("Could not connect to plug. Trying to relogin", exc_info=True)
                 self.__p100_handshake_login()
 
                 func(self, *args, **kwargs)
