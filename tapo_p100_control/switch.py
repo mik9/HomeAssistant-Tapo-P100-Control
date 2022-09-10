@@ -101,14 +101,14 @@ class P100Plug(SwitchEntity):
         """Turn Plug On"""
 
         self._p100.turnOn()
-        self._is_on = True
+        self._attr_is_on = True
 
     @__relogin_if_needed
     def turn_off(self, **kwargs):
         """Turn Plug Off"""
 
         self._p100.turnOff()
-        self._is_on = False
+        self._attr_is_on = False
 
     @__relogin_if_needed
     def update(self):
@@ -118,5 +118,5 @@ class P100Plug(SwitchEntity):
         name = b64decode(encodedName)
         self._name = name.decode("utf-8")
 
-        self._is_on = data["result"]["device_on"]
+        self._attr_is_on = data["result"]["device_on"]
         self._unique_id = data["result"]["device_id"]
