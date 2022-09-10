@@ -71,14 +71,17 @@ class P100Plug(SwitchEntity):
 
         self.update()
 
-    def __wrap_p100_call(self, call):
-        try:
-            return call(self._p100)
-        except:
-            _LOGGER.error("Could not connect to plug. Trying to relogin")
-            
-            self.__p100_handshake_login()
-            return call(self._p100)
+    def __relogin_if_needed(func):
+        def wrapped(self, *args, **kwargs):
+            try:
+                func(self, *args, **kwargs)
+            except:
+                _LOGGER.error("Could not connect to plug. Trying to relogin")
+                self.__p100_handshake_login()
+
+                func(self, *args, **kwargs)
+        
+        return wrapped
 
     @property
     def name(self):
@@ -90,21 +93,23 @@ class P100Plug(SwitchEntity):
         """Unique id."""
         return self._unique_id
 
+    @__relogin_if_needed
     def turn_on(self, **kwargs) -> None:
         """Turn Plug On"""
 
-        self.__wrap_p100_call(lambda p100: p100.turnOn())
+        self._p100.turnOn()
         self._is_on = True
 
+    @__relogin_if_needed
     def turn_off(self, **kwargs):
         """Turn Plug Off"""
 
-        self.__wrap_p100_call(lambda p100: p100.turnOff())
-
+        self._p100.turnOff()
         self._is_on = False
 
+    @__relogin_if_needed
     def update(self):
-        data = self.__wrap_p100_call(lambda p100: p100.getDeviceInfo())
+        data = self._p100.getDeviceInfo()
 
         encodedName = data["result"]["nickname"]
         name = b64decode(encodedName)
