@@ -10,6 +10,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.switch import (
     SwitchEntity,
     PLATFORM_SCHEMA,
+    SwitchDeviceClass,
     )
 from homeassistant.const import CONF_IP_ADDRESS, CONF_EMAIL, CONF_PASSWORD
 
@@ -45,6 +46,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
 class P100Plug(SwitchEntity):
     """Representation of a P100 Plug"""
+
+    _attr_device_class = SwitchDeviceClass.OUTLET
 
     def __init__(self, ipAddress, email, password):
         self.ipAddress = ipAddress
